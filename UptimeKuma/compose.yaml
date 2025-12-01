@@ -1,0 +1,10 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - ${UPK_DIR}/data:/app/data
+    ports:
+      # <Host Port>:<Container Port>
+      - "3001:3001"
