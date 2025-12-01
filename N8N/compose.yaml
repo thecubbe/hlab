@@ -1,7 +1,7 @@
 services:
   n8n:
     image: n8nio/n8n:1.116.2
-    container_name: neightn-hlab
+    container_name: neightn-hlab # ${CNTNR_NAME}
     restart: always
     ports:
      - 5678:5678
