@@ -1,0 +1,34 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: wordpress-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${WP_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${WP_DB}
+      MYSQL_USER: ${WP_DB_USERNAME}
+      MYSQL_PASSWORD: ${WP_DB_PASSWORD}
+    volumes:
+      - ${WP_DIR}/db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  wordpress:
+    image: wordpress:6.7
+    container_name: wordpress
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${WP_DB}
+      WORDPRESS_DB_USER: ${WP_DB_USERNAME}
+      WORDPRESS_DB_PASSWORD: ${WP_DB_PASSWORD}
+    volumes:
+      - ${WP_DIR}/wordpress_data:/var/www/html
+    ports:
+      - "8001:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
