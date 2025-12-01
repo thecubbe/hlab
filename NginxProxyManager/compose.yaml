@@ -1,0 +1,31 @@
+services:
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-pm
+    restart: unless-stopped
+    ports:
+      - '80:80'      # Public HTTP Port
+      - '443:443'    # Public HTTPS Port
+      - '81:81'      # Admin Web Port
+    environment:
+      DB_POSTGRES_HOST: 'db'
+      DB_POSTGRES_PORT: '5432'
+      DB_POSTGRES_USER: ${PSTGRS_USER}
+      DB_POSTGRES_PASSWORD: ${PSTGRS_PASSWORD}
+      DB_POSTGRES_NAME: ${PSTGRS_DB}
+      # DISABLE_IPV6: 'true'
+    volumes:
+      - ${NPM_DIR}/data:/data
+      - ${NPM_DIR}/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    container_name: nginx-pm-db
+    environment:
+      POSTGRES_USER: ${PSTGRS_USER}
+      POSTGRES_PASSWORD: ${PSTGRS_PASSWORD}
+      POSTGRES_DB: ${PSTGRS_DB}
+    volumes:
+      - ${NPM_DIR}/postgres:/var/lib/postgresql/data
