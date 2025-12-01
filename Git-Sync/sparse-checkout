@@ -1,0 +1,3 @@
+# sparse-checkout file is deployed locally
+# Sync only chosen data directory (example for Treafik config files - hlab repo):
+Traefik/data
