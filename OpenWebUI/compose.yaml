@@ -1,0 +1,54 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    restart: always
+    volumes:
+      - ${OI_DIR}/data:/app/backend/data
+    ports:
+      - 8000:8080 # ${OPEN-WEBUI-PORT}:8080
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+    environment:
+       GLOBAL_LOG_LEVEL: "DEBUG"
+       ENABLE_PERSISTENT_CONFIG: "TRUE"
+       ENABLE_LOGIN_FORM: "TRUE"
+       ENABLE_ADMIN_EXPORT: "TRUE"
+       ENABLE_ADMIN_CHAT_ACCESS: "TRUE"
+       ENABLE_REALTIME_CHAT_SAVE: "FALSE"
+       BYPASS_MODEL_ACCESS_CONTROL: "FALSE"
+       WEBUI_AUTH: "TRUE"
+       ENABLE_VERSION_UPDATE_CHECK: "TRUE"
+       OFFLINE_MODE: "FALSE"
+       WEBUI_URL: ${WEBUI-URL}
+       WEBUI_SECRET_KEY: ${WEBUI-SECRET-KEY}
+       PENDING_USER_OVERLAY_TITLE: ${PENDING-USER-OVERLAY-TITLE}
+       PENDING_USER_OVERLAY_CONTENT: ${PENDING-USER-OVERLAY-CONTENT}
+       RESPONSE_WATERMARK: ${RESPONSE-WATERMARK}
+       ADMIN_EMAIL: ${ADMIN-EMAIL}
+       CUSTOM_NAME: "OI"
+       WEBUI_NAME: "OI" #${WEBUI-NAME}
+       PORT: ${PORT}
+      # --- OpenAI ---
+      #- ENABLE_OPENAI_API=${ENABLE-OPENAI-API}
+      #- OPENAI_API_BASE_URL=${OPENAI-API-BASE-URL}
+      #- OPENAI_API_BASE_URLS=${OPENAI-API-BASE-URLS}
+      #- OPENAI_API_KEY=${OPENAI-API-KEY}
+      #- OPENAI_API_KEYS=${OPENAI-API-KEYS}
+      # --- OpenTelemetry ---
+      #- ENABLE_OTEL=true
+      #- ENABLE_OTEL_METRICS=true
+      #- OTEL_EXPORTER_OTLP_INSECURE=true # Use insecure connection for OTLP, you may want to remove this in production
+      #- OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana:4317
+      #- OTEL_SERVICE_NAME=open-webui
+      # You may set OTEL_BASIC_AUTH_USERNAME/PASSWORD here if needed
+
+    networks:
+      - open-webui_network
+
+networks:
+  open-webui_network:
+    driver: bridge
