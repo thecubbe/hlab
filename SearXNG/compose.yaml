@@ -1,0 +1,47 @@
+services:
+  searxng-gluetun:
+    image: qmcgaw/gluetun
+    container_name: searxng-gluetun
+    hostname: searxng-gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8080:8080     # searxng
+    volumes:
+      - ${SXNG_DIR}/gluetun:/gluetun
+    environment:
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - SERVER_COUNTRIES=Slovakia,Austria,Poland,Hungary
+      - TZ=Europe/Bratislava
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    network_mode: "service:searxng-gluetun"
+    environment:
+      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME}/
+      - UWSGI_WORKERS=${SEARXNG_UWSGI_WORKERS:-4}
+      - UWSGI_THREADS=${SEARXNG_UWSGI_THREADS:-4}        
+    volumes:
+      -  ${SXNG_DIR}/searxng-data:/etc/searxng:rw
+    # remove for first run then re-enable 
+    # cap_drop: 
+    #   - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+    depends_on:
+      searxng-gluetun:
+        condition: service_healthy
