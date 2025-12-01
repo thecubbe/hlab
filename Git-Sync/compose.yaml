@@ -1,0 +1,24 @@
+services:
+  git-sync:
+    image: registry.k8s.io/git-sync/git-sync:v4.3.0
+    container_name: git-sync
+    restart: unless-stopped
+    environment:
+      GITSYNC_REPO: "${GITSYNC_REPO}"
+      GITSYNC_REF: "main"
+      GITSYNC_ROOT: "/git"
+      GITSYNC_LINK: "current"
+      GITSYNC_PERIOD: "30s"
+      GITSYNC_ONE_TIME: "false"
+      GITSYNC_MAX_FAILURES: "-1"
+      GITSYNC_USERNAME: "${GITSYNC_USERNAME}"
+      GITSYNC_PASSWORD: "${GITSYNC_TOKEN}"
+      GITSYNC_SPARSE_CHECKOUT_FILE: "/etc/git-sync/sparse-checkout"
+    command:
+      - --sync-hook-command=/scripts/restart.sh
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${TARGET_DIR}/data:/git
+      - ${GITSYNC_DIR}/sparse-checkout:/etc/git-sync/sparse-checkout:ro
+      - ${GITSYNC_DIR}/restart.sh:/scripts/restart-traefik-devl.sh:ro
+    user: "1000:988" # your user ID : docker group ID
