@@ -1,0 +1,24 @@
+{
+    "cloudflare": [
+      {
+        "authentication": {
+          "api_token": "api_token_here",
+          "api_key": {
+            "api_key": "api_key_here",
+            "account_email": "your_email_here"
+          }
+        },
+        "zone_id": "zone_id_here",
+        "subdomains": [
+          {
+            "name": "sub-domain-here",
+            "proxied": false
+          }
+        ]
+      }
+    ],
+    "a": true,
+    "aaaa": true,
+    "purgeUnknownRecords": false,
+    "ttl": 300
+  }
