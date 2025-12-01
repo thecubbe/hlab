@@ -1,0 +1,27 @@
+services:
+  n8n:
+    image: n8nio/n8n:1.116.2
+    container_name: neightn-hlab
+    restart: always
+    ports:
+     - 5678:5678
+    volumes:
+     - ${N8N_DIR}/n8n_data:/home/node/.n8n
+     - ${N8N_DIR}/local_files:/files
+    environment:
+     - N8N_PROTOCOL=https
+     - NODE_ENV=production
+     - N8N_METRICS=true
+     - N8N_DIAGNOSTICS_ENABLED=false
+     - QUEUE_HEALTH_CHECK_ACTIVE=true
+     - N8N_SECURE_COOKIE=false
+     - N8N_HOST=${HOST_N8N}
+     - GENERIC_TIMEZONE=${TIMEZONE}
+     - N8N_EDITOR_BASE_URL=https://${PHOST_N8N}/
+     - WEBHOOK_URL=https://${HOST_N8N}/
+    networks:
+      neightn:
+
+networks:
+  neightn:
+    external: true
