@@ -1,0 +1,19 @@
+services:
+  plex:
+    image: linuxserver/plex:latest
+    container_name: plex-server
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+      - VERSION=docker
+      - PLEX_CLAIM=claim-xxxxxxxxxxxxxxxxx # Plex claim at https://account.plex.tv/claim
+    devices:
+      - "/dev/dri:dev/dri"
+    volumes:
+      - ./config:/config
+    #  - /tmp/plex:/transcode
+      - /PlexMedia/data/media/tv:/tv
+      - /PlexMedia/data/media/movies:/movies
+    restart: unless-stopped
