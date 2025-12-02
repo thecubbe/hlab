@@ -1,0 +1,111 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    hostname: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 6881:6881     #
+      - 6881:6881/udp #
+      - 8085:8085     # qbittorrent
+      - 9696:9696     # prowlarr
+      - 8191:8191     # flaresolverr
+      - 7878:7878     # radarr
+      - 8989:8989     # sonarr
+    volumes:
+      - ${ARR_DIR}/gluetun:/gluetun
+    environment:
+      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - SERVER_COUNTRIES=Poland,Hungary,Austria,Slovakia
+      - TZ=Europe/Vienna
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    deploy:
+      resources:
+        limits:
+          memory: 4096M
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+      - WEBUI_PORT=8085
+    volumes:
+      - ${ARR_DIR}/qbittorrent/config:/config
+      - ${MNT_DIR}/data/torrents:/data/torrents
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    restart: always
+
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    container_name: prowlarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+    volumes:
+      - ${ARR_DIR}/prowlarr/config:/config
+    restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
+
+  flaresolverr:
+    image: flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    network_mode: "service:gluetun"
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=Europe/Vienna
+    volumes:
+      - ${ARR_DIR}/flaresolverr/config:/config
+    restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+    volumes:
+      - ${ARR_DIR}/radarr/config:/config
+      - ${MNT_DIR}/data:/data
+    restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+    volumes:
+      - ${ARR_DIR}/sonarr/config:/config
+      - ${MNT_DIR}/data:/data
+    restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
