@@ -6,27 +6,26 @@ services:
     ports:
       - "8989:80"
     environment:
-      # PMA_ARBITRARY: 1
-      PMA_VERBOSE: ${VERBOSE}
-      PMA_HOST: ${MYSQL_HOST}
-      PMA_PORT: ${MYSQL_PORT}
-      PMA_USER: ${MYSQL_USER}
-      PMA_PASSWORD: ${MYSQL_PASSWORD}
-      PMA_SSL: 1
-      #PMA_ABSOLUTE_URI: ${PMA_ABSOLUTE_URI}
+      PMA_ARBITRARY: 1
       MEMORY_LIMIT: 512M           # Default: 512M
       UPLOAD_LIMIT: 2048M          # Default: 2048K (file upload size)
       MAX_EXECUTION_TIME: 600      # Default: 600 (seconds)
       TZ: Europe/Vienna
-    # user: "1000:1000"
+      PMA_SSL: 1
+      MYSQL_USER_REMOTE: ${MYSQL_USER_REMOTE}
+      MYSQL_PASSWORD_REMOTE: ${MYSQL_PASSWORD_REMOTE}
+      MYSQL_USER_L1: ${MYSQL_USER_L1}
+      MYSQL_PASSWORD_L1: ${MYSQL_PASSWORD_L1}
+      MYSQL_USER_L2: ${MYSQL_USER_L2}
+      MYSQL_PASSWORD_L2: ${MYSQL_PASSWORD_L2}
     volumes:
-    #  - ${PMA_DIR}/sessions:/sessions
-    #  - ${PMA_DIR}/config/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
-    #  - ${PMA_DIR}/themes:/www/themes/mytheme:ro
-      - ${PMA_DIR}/uploads:/var/www/html/upload
+    #  - ${DIR}/sessions:/sessions
+      - ${DIR}/config/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+    #  - ${DIR}/themes:/www/themes/mytheme:ro
+      - ${DIR}/uploads:/var/www/html/upload
     networks:
-      - pma_network
+      - phpmyadmin_network
 
 networks:
-  pma_network:
+  phpmyadmin_network:
     external: true
