@@ -1,0 +1,1 @@
+//<your_nas_server_ip>/<SMBShareName> /mnt/<ShareMountLocation> cifs username=<your_smb_user>,password=<your_smb_password>,uid=1000,gid=1000 0 0
